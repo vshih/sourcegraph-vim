@@ -29,7 +29,7 @@ vim +NeoBundleInstall +qall
 
 * [vim-plug](https://github.com/junegunn/vim-plug)
 ```shell
-echo "Plug 'sourcegraph/sourcegraph-vim'" >> ~/.vimrc
+echo "Plug 'sourcegraph/sourcegraph-vim', {'for': ['go']}" >> ~/.vimrc
 vim +PlugInstall
 ```
 
@@ -106,4 +106,4 @@ g:SOURCEGRAPH_SEND_URL = "https://grpc.sourcegraph.com"
 
 ## Support
 
-Sourcegraph for Vim has been tested on Vim 7.3, and requires Python 2.X or Python 3.X to be compiled with your Vim installation. To determine if your Vim is compiled with Python, try running ```:python import sys; print(sys.version)``` from within Vim, and verify that it does not throw an error.
+Sourcegraph for Vim has been tested on Vim 7.3, and requires Python 2.X or Python 3.X to be compiled with your Vim installation. To determine if your Vim is compiled with Python, try running ```:echo has ('python')``` OR ```:echo has('python3')``` from within Vim, and verify that it does not throw an error.
