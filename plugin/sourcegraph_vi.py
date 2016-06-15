@@ -65,6 +65,15 @@ def startup():
 
 	sourcegraph_lib.request_manager.setup(settings)
 
+	def vim_echo_error(text):
+		sourcegraph_lib.request_manager.error_lock.acquire()
+		if sourcegraph_lib.request_manager.error_shown == False:
+			sourcegraph_lib.request_manager.error_shown = True
+			vim.command('echoerr "%s"' % text.replace('"','\\"'))
+		sourcegraph_lib.request_manager.error_lock.release()
+
+	sourcegraph_lib.ERROR_CALLBACK = vim_echo_error
+
 if vim.eval("s:startup") == "true":
 	startup()
 	t = Thread(target=sourcegraph_lib.request_manager.run)
