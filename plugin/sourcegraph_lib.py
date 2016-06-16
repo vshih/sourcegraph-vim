@@ -550,7 +550,6 @@ def validate_settings(settings):
 	go_err = check_go(settings)
 	if go_err:
 		return go_err
-	return ERR_GODEFINFO_INSTALL
 	# Check that godefinfo is available
 	godefinfo_command = ['godefinfo', '-v']
 	out, err, return_code = run_shell_command(godefinfo_command, settings.ENV)
