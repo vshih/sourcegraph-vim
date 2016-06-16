@@ -472,16 +472,7 @@ def log_major_failure(error_callback, text):
 	logging.error(text)
 
 def log_output(output, log_type='debug', is_symbol=False, is_network=False):
-	## Added to prevent NeoVim from breaking on a None object
-	if not output:
-		output = "None"
-
-	if LOG_LEVEL == LOG_ALL:
-		print(output)
-	elif LOG_LEVEL == LOG_NETWORK and is_network:
-		print(output)
-	elif LOG_LEVEL == LOG_SYMBOLS and is_symbol:
-		print(output)
+	## see output in in the log file (/tmp/sourcegraph-vim.log) by default
 	if log_type == 'debug':
 		logging.debug(output)
 	elif log_type == 'info':

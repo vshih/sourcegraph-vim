@@ -47,9 +47,6 @@ def startup():
 	gobin = get_vim_variable('g:SOURCEGRAPH_GOBIN')
 	if gobin:
 		settings.GOBIN = gobin.rstrip(os.sep)
-	log_level = get_vim_variable('g:SOURCEGRAPH_LOG_LEVEL')
-	if log_level:
-		sourcegraph_lib.LOG_LEVEL = int(log_level)
 	enable_lookback = get_vim_variable('g:SOURCEGRAPH_ENABLE_LOOKBACK')
 	if enable_lookback:
 		settings.ENABLE_LOOKBACK = bool(enable_lookback)

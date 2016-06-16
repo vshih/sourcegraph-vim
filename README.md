@@ -71,20 +71,11 @@ g:SOURCEGRAPH_GOPATH = "/path/to/gopath"
 g:SOURCEGRAPH_GOBIN = "/path/to/gobin"
 ```
 
-### Verbose logging
+### Logging
 
-This setting gives verbose output from Sourcegraph for Vim to the Vim console, which can be helpful when troubleshooting Sourcegraph for Vim. Different levels of logging are available:
-
-No logging: `0`
-
-Only log symbols identified by godefinfo: `1`
-
-Log network calls: `2`
-
-Log all debugging information: `3`
-
+To see verbose out put from Sourcegraph for Vim, you can check the contents of the logging file. This logging file can be set in .vimrc, but by default, it is here:
 ```
-g:SOURCEGRAPH_LOG_LEVEL = 1
+g:SOURCEGRAPH_LOG_FILE = "/tmp/sourcegraph-vim.log"
 ```
 
 ## Godefinfo
