@@ -472,6 +472,10 @@ def log_major_failure(error_callback, text):
 	logging.error(text)
 
 def log_output(output, log_type='debug', is_symbol=False, is_network=False):
+	## Added to prevent NeoVim from breaking on a None object
+	if not output:
+		output = "None"
+
 	if LOG_LEVEL == LOG_ALL:
 		print(output)
 	elif LOG_LEVEL == LOG_NETWORK and is_network:
@@ -559,7 +563,7 @@ def validate_settings(settings):
 	go_err = check_go(settings)
 	if go_err:
 		return go_err
-
+	return ERR_GODEFINFO_INSTALL
 	# Check that godefinfo is available
 	godefinfo_command = ['godefinfo', '-v']
 	out, err, return_code = run_shell_command(godefinfo_command, settings.ENV)
