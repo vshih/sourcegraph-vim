@@ -106,7 +106,7 @@ g:SOURCEGRAPH_SEND_URL = "https://grpc.sourcegraph.com"
 
 ## Diagnostic
 
-Sourcegraph for Vim comes with a diagnostic file called `diagnostic.py`. In case of issues setting up Sourcegraph for Vim, trying running this file to determine the cause. If there is an error that you are unable to debug, please report the output of this tool in issues on GitHub. Here is a sample successful output:
+Sourcegraph for Vim comes with a diagnostic file called `diagnostic.py`. In case of issues setting up Sourcegraph for Vim, trying running this file using Python 2.X to determine the cause. If there is an error that you are unable to debug, please report the output of this tool in issues on GitHub. Here is a sample successful output:
 ```
 python diagnostic.py [-g /path/to/gopath] [-b /path/to/go/binary]
 -------------------------
