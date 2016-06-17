@@ -43,7 +43,7 @@ class Request_Manager():
 
 	def setup(self, settings):
 		self.sourcegraph_instance = Sourcegraph(settings)
-		# Do a blocking "go get" incase the user does not have `godefinfo` 
+		# Do a blocking "go get" incase the user does not have `godefinfo`
 		self.sourcegraph_instance.post_load(False)
 		b = Thread(target=self.sourcegraph_instance.post_load, args=[True]).start()
 
@@ -394,7 +394,11 @@ class Settings(object):
 		json_params = {}
 		for param in self.__dict__:
 			if self.__dict__[param]:
-				json_params[param] = self.__dict__[param]
+				if param == "ENV":
+					json_params["GOPATH"] = self.__dict__[param]["GOPATH"]
+					json_params["PATH"] = self.__dict__[param]["PATH"]
+				else:
+					json_params[param] = self.__dict__[param]
 		return json.dumps(json_params, ensure_ascii=False)
 
 
