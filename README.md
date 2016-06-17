@@ -104,6 +104,31 @@ g:SOURCEGRAPH_BASE_URL = "https://sourcegraph.com"
 g:SOURCEGRAPH_SEND_URL = "https://grpc.sourcegraph.com"
 ```
 
+## Diagnostic
+
+Sourcegraph for Vim comes with a diagnostic file called `diagnostic.py`. In case of issues setting up Sourcegraph for Vim, trying running this file to determine the cause. If there is an error that you are unable to debug, please report the output of this tool in issues on GitHub. Here is a sample successful output:
+```
+python diagnostic.py [-g /path/to/gopath] [-b /path/to/go/binary]
+-------------------------
+----Printing settings object with default values.
+{"SG_CHANNEL": "username-b97d52e5cb54c7f93def242612a934b72d3a", "GOPATH": "/Users/username/gopath", "SG_BASE_URL": "https://sourcegraph.com", "GOBIN": "/usr/local/go/bin/go", "EditorType": "undefined", "SG_SEND_URL": "https://grpc.sourcegraph.com", "VersionMinor": 1, "PATH": "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/username/gopath/bin", "ENABLE_LOOKBACK": true}
+----VERIFY GOPATH and PATH settings, to ensure that the go binary is in the PATH, and GOPATH is correctly set.
+----Validating settings object. If value is not none, Sourcegraph for your editor is not configured properly.
+--------Checking if shell is supported.
+--------Checking if `pwd` works on the shell.
+--------Checking GOPATH settings.
+--------Running go binary and checking version.
+--------Checking if godefinfo binary is in $GOPATH/bin, and running godefinfo -v.
+----VERIFY output of validate settings is None: None
+----Assembling Sourcegraph object.
+----VERIFY that $GOPATH/bin is in the path. PATH = /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/username/gopath/bin
+----Testing browser settings.
+----VERIFY browser opens.
+-------------------------
+Diagnostic completed.
+-------------------------
+```
+
 ## Support
 
 Sourcegraph for Vim has been tested on Vim 7.3, and requires Python 2.X or Python 3.X to be compiled with your Vim installation. To determine if your Vim is compiled with Python, try running ```:echo has ('python')``` OR ```:echo has('python3')``` from within Vim, and verify that it does not throw an error.
