@@ -4,6 +4,66 @@ import vim
 from threading import Thread
 sys.path.append(os.path.dirname(vim.eval("s:path")))
 import sourcegraph_lib
+import socket
+import json
+import base64
+import logging
+
+_SOCKET_FILE = "/tmp/app.sourcegraph"
+
+sourcegraph_lib.SG_LOG_FILE = '/tmp/sourcegraph-vim.log'
+settings = sourcegraph_lib.Settings()
+settings.EditorType = "vim"
+
+sg = sourcegraph_lib.Sourcegraph(settings)
+sourcegraph_lib.log_output("print")
+
+
+
+class Logger:
+	log_file = '/tmp/sourcegraph-vim.log'
+	
+        def __init__(self):
+		self._setup_logging()
+		return
+
+	def _setup_logging(self):
+		root = logging.getLogger()
+		if root.handlers:
+			for handler in root.handlers:
+				root.removeHandler(handler)
+		logging.basicConfig(filename=self.log_file, filemode='w', level=logging.DEBUG)
+		self.log_output('logging', 'setup logging @ %s' % self.log_file)
+
+	def log_output(self, log_message, log_category="debug"):
+		output_string = '[%s] %s' % (log_category, log_message)
+		logging.debug(output_string)
+
+	def log_error(self, log_category, log_message):
+		output_string = '[%s] %s' % (log_category, log_message)
+		logging.error(output_string)
+		print(output_string)
+
+logger = Logger()
+
+
+def send_request_to_socket(filename, cursor_offset, selected_token, file_buffer):
+	sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        message = {"type": "sourcegraph-editor", "data": {"filename": filename, "cursor_offset": cursor_offset, "selected_token": selected_token, "file_buffer": base64.b64encode(file_buffer).decode("utf-8")}}
+        message_json = json.dumps(message)
+	try:
+		sock.connect(_SOCKET_FILE)
+                logger.log_output("0")                
+		sock.send(bytes(message_json))
+                logger.log_output("1")
+		sock.send(bytes("\f"))
+	except Exception as error:
+		#_SUBLIME_SETTINGS.log_error('network', error)
+		#_SUBLIME_SETTINGS.log_error('network', 'failed to send lookup request to socket')
+                logger.log_output(error)
+	finally:
+		sock.close()
+
 
 def get_vim_variable(variable_name):
 	var_exists = vim.eval("exists('%s')" % variable_name)
@@ -11,70 +71,19 @@ def get_vim_variable(variable_name):
 		return vim.eval(variable_name)
 	return None
 
-def get_channel():
-	variable_name = "g:SOURCEGRAPH_CHANNEL"
-	var_exists = vim.eval("exists('%s')" % variable_name)
-	if var_exists is not '0':
-		return vim.eval(variable_name)
-	else:
-		channel_id = sourcegraph_lib.generate_channel_id()
-		vim.command("let %s = '%s'" % (variable_name, channel_id))
-		return channel_id
-
-
-def add_symbol_task(filename, curr_word, curr_offset, numlines):
+def get_file_buffer(filename, curr_word, curr_offset, numlines):
 	lines = []
 	for i in range(1, numlines + 1):
 		currline = vim.eval("getline('%s')" % str(i))
 		lines.append(currline)
-	args = sourcegraph_lib.LookupArgs(filename=filename, cursor_offset=curr_offset, preceding_selection="\n".join(lines), selected_token=curr_word)
-	sourcegraph_lib.request_manager.add(args)
+        return "\n".join(lines)
 
-def startup():
+filename = vim.eval("s:filename")
+curr_offset = vim.eval("s:curroffset")
+curr_word = vim.eval("s:currword")
+numlines = int(vim.eval("s:numlines"))
+file_buffer = get_file_buffer(filename, curr_word, curr_offset, numlines)
 
-	sourcegraph_lib.SG_LOG_FILE = '/tmp/sourcegraph-vim.log'
-	settings = sourcegraph_lib.Settings()
-	channel_id = get_channel()
-	settings.SG_CHANNEL = channel_id
-	settings.EditorType = "vim"
+send_request_to_socket(filename, curr_offset, curr_word, file_buffer)
 
-	gopath = get_vim_variable('g:SOURCEGRAPH_GOPATH')
-	if gopath:
-		settings.ENV['GOPATH'] = str(gopath.rstrip(os.sep)).strip()
-	auto = get_vim_variable('g:SOURCEGRAPH_AUTO')
-	if auto:
-		settings.AUTO = bool(auto)
-	gobin = get_vim_variable('g:SOURCEGRAPH_GOBIN')
-	if gobin:
-		settings.GOBIN = gobin.rstrip(os.sep)
-	enable_lookback = get_vim_variable('g:SOURCEGRAPH_ENABLE_LOOKBACK')
-	if enable_lookback:
-		settings.ENABLE_LOOKBACK = bool(enable_lookback)
-	base_url = get_vim_variable('g:SOURCEGRAPH_BASE_URL')
-	if base_url:
-		settings.SG_BASE_URL = base_url
-	send_url = get_vim_variable('g:SOURCEGRAPH_SEND_URL')
-	if send_url:
-		settings.SG_SEND_URL = send_url
-	log_file = get_vim_variable('g:SOURCEGRAPH_LOG_FILE')
-	if log_file:
-		sourcegraph_lib.SG_LOG_FILE = log_file
-
-	sourcegraph_lib.request_manager.setup(settings)
-
-	def vim_echo_error(text):
-		sourcegraph_lib.request_manager.error_lock.acquire()
-		if sourcegraph_lib.request_manager.error_shown == False:
-			sourcegraph_lib.request_manager.error_shown = True
-			vim.command('echoerr "%s"' % text.replace('"','\\"'))
-		sourcegraph_lib.request_manager.error_lock.release()
-
-	sourcegraph_lib.ERROR_CALLBACK = vim_echo_error
-
-if vim.eval("s:startup") == "true":
-	startup()
-	t = Thread(target=sourcegraph_lib.request_manager.run)
-	t.setDaemon(True)
-	t.start()
-else:
-	add_symbol_task(os.path.abspath(vim.eval("s:filename")), vim.eval("s:currword"), vim.eval("s:curroffset"), int(vim.eval("s:numlines")))
+#add_symbol_task(os.path.abspath(vim.eval("s:filename")), vim.eval("s:currword"), vim.eval("s:curroffset"), int(vim.eval("s:numlines")))

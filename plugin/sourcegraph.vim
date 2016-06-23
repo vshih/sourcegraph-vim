@@ -4,8 +4,6 @@ if !has('python')
 	finish
 endif
 
-let s:startup = "true"
-
 if !exists("g:SOURCEGRAPH_AUTO") || g:SOURCEGRAPH_AUTO == "true"
     augroup SourcegraphVim
         autocmd VimEnter     *.go call LookupSymbol()
@@ -23,12 +21,9 @@ let s:last_word_small = ''
 let s:last_offset = 0
 let s:last_linenumber = -1
 
-function! LookupSymbol()
-	if s:startup == "true"
-		execute "pyfile " . s:path
-		let s:startup = "false"
-	endif
+au BufNewFile,BufRead *.go set filetype=go
 
+function! LookupSymbol()
 	let s:filename = expand('%:p')
 	let s:currword = expand('<cWORD>')
 	let s:currword_small = expand('<cword>')
