@@ -35,7 +35,7 @@ class Logger:
 		logging.basicConfig(filename=self.log_file, filemode='w', level=logging.DEBUG)
 		self.log_output('logging', 'setup logging @ %s' % self.log_file)
 
-	def log_output(self, log_message, log_category="debug"):
+	def log_output(self, log_category, log_message):
 		output_string = '[%s] %s' % (log_category, log_message)
 		logging.debug(output_string)
 
@@ -58,9 +58,7 @@ def send_request_to_socket(filename, cursor_offset, selected_token, file_buffer)
                 logger.log_output("1")
 		sock.send(bytes("\f"))
 	except Exception as error:
-		#_SUBLIME_SETTINGS.log_error('network', error)
-		#_SUBLIME_SETTINGS.log_error('network', 'failed to send lookup request to socket')
-                logger.log_output(error)
+                logger.log_output(network, error)
 	finally:
 		sock.close()
 
@@ -85,5 +83,3 @@ numlines = int(vim.eval("s:numlines"))
 file_buffer = get_file_buffer(filename, curr_word, curr_offset, numlines)
 
 send_request_to_socket(filename, curr_offset, curr_word, file_buffer)
-
-#add_symbol_task(os.path.abspath(vim.eval("s:filename")), vim.eval("s:currword"), vim.eval("s:curroffset"), int(vim.eval("s:numlines")))
