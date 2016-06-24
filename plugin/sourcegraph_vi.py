@@ -16,9 +16,6 @@ settings = sourcegraph_lib.Settings()
 settings.EditorType = "vim"
 
 sg = sourcegraph_lib.Sourcegraph(settings)
-sourcegraph_lib.log_output("print")
-
-
 
 class Logger:
 	log_file = '/tmp/sourcegraph-vim.log'
