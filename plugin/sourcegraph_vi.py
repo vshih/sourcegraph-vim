@@ -9,9 +9,19 @@ import json
 import base64
 import logging
 
+
+def get_vim_variable(variable_name):
+	var_exists = vim.eval("exists('%s')" % variable_name)
+	if var_exists is not '0':
+		return vim.eval(variable_name)
+	return None
+
 _SOCKET_FILE = "/tmp/app.sourcegraph"
 
-sourcegraph_lib.SG_LOG_FILE = '/tmp/sourcegraph-vim.log'
+log_file = get_vim_variable("g:SOURCEGRAPH_LOG_FILE")
+if log_file is None:
+    log_file = "/tmp/sourcegraph-vim.log"
+
 settings = sourcegraph_lib.Settings()
 settings.EditorType = "vim"
 
@@ -32,14 +42,17 @@ class Logger:
 		logging.basicConfig(filename=self.log_file, filemode='w', level=logging.DEBUG)
 		self.log_output('logging', 'setup logging @ %s' % self.log_file)
 
-	def log_output(self, log_category, log_message):
+	def log_output(self, log_category, log_message, log_console=False):
 		output_string = '[%s] %s' % (log_category, log_message)
-		logging.debug(output_string)
+                logging.debug(output_string)
+                if log_console:
+                    vim.eval("echoerr %s" % log_message)
 
-	def log_error(self, log_category, log_message):
+	def log_error(self, log_category, log_message, log_console=False):
 		output_string = '[%s] %s' % (log_category, log_message)
 		logging.error(output_string)
-		print(output_string)
+                if log_console == True:
+                    vim.eval("echoerr %s" % log_message)
 
 logger = Logger()
 
@@ -53,16 +66,9 @@ def send_request_to_socket(filename, cursor_offset, selected_token, file_buffer)
 		sock.send(bytes(message_json))
 		sock.send(bytes("\f"))
 	except Exception as error:
-                logger.log_output(network, error)
+                logger.log_output("network", error)
 	finally:
 		sock.close()
-
-
-def get_vim_variable(variable_name):
-	var_exists = vim.eval("exists('%s')" % variable_name)
-	if var_exists is not '0':
-		return vim.eval(variable_name)
-	return None
 
 def get_file_buffer(filename, curr_word, curr_offset, numlines):
 	lines = []
