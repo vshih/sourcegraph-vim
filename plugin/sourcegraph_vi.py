@@ -50,9 +50,7 @@ def send_request_to_socket(filename, cursor_offset, selected_token, file_buffer)
         message_json = json.dumps(message)
 	try:
 		sock.connect(_SOCKET_FILE)
-                logger.log_output("0")                
 		sock.send(bytes(message_json))
-                logger.log_output("1")
 		sock.send(bytes("\f"))
 	except Exception as error:
                 logger.log_output(network, error)
