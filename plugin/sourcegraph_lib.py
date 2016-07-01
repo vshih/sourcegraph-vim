@@ -453,32 +453,6 @@ class ExportedParams(object):
 	def __str__(self):
 		return self.to_json()
 
-def setup_logging():
-	root = logging.getLogger()
-	if root.handlers:
-		for handler in root.handlers:
-			root.removeHandler(handler)
-	logging.basicConfig(filename=SG_LOG_FILE, filemode='w', level=logging.DEBUG)
-	log_output('[settings] Set up logging to file %s' % SG_LOG_FILE)
-
-
-def log_symbol_failure(reason=None):
-	if reason:
-		log_output('Failed to find symbol. Reason: %s' % reason, is_symbol=True)
-
-def log_major_failure(error_callback, text):
-	if error_callback:
-		error_callback(text)
-	logging.error(text)
-
-def log_output(output, log_type='debug', is_symbol=False, is_network=False):
-	## see output in in the log file (/tmp/sourcegraph-vim.log) by default
-	if log_type == 'debug':
-		logging.debug(output)
-	elif log_type == 'info':
-		logging.info(output)
-	elif log_type == 'error':
-		logging.error(output)
 
 
 def parse_import_path(godefinfo_err):
