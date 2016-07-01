@@ -3,7 +3,6 @@ import sys
 import vim
 from threading import Thread
 sys.path.append(os.path.dirname(vim.eval("s:path")))
-import sourcegraph_lib
 import socket
 import json
 import base64
