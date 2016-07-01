@@ -86,6 +86,14 @@ def get_vim_variables():
     variables["is_dirty"] = True if int(variables["is_dirty"]) == 1 else False
     return variables
 
-vim_variables = get_vim_variables()
-logger.log_output("editor ",  str(vim_variables))
-send_request_to_socket(vim_variables)
+
+_ALLOWED_EXTENSIONS = ['go', 'py', 'js', 'jsx', 'java']
+def allow_file(filename):
+	for extension in _ALLOWED_EXTENSIONS:
+		if filename is not None and filename.endswith(extension):
+			return True
+	return False
+
+if allow_file(vim.eval("s:filename")):
+    vim_variables = get_vim_variables()
+    send_request_to_socket(vim_variables)
