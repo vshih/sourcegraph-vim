@@ -25,7 +25,7 @@ let s:last_linenumber = -1
 
 function! LookupSymbol()
 	if s:startup == "true"
-		execute "pyfile " . s:path
+		execute "pyfile " . fnameescape(s:path)
 		let s:startup = "false"
 	endif
 
@@ -42,7 +42,7 @@ function! LookupSymbol()
 		let s:last_word_small = s:currword_small
 		let s:last_offset = s:curroffset
 		let s:last_linenumber = s:linenumber
-		execute "pyfile " . s:path
+		execute "pyfile " . fnameescape(s:path)
 	endif
 endfunction
 
